@@ -1,23 +1,31 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import HomePage from "./components/Pages/Home";
-import EventsPage, { loader as eventLoader } from "./components/Pages/Events";
+
+import EditEventPage from "./pages/EditEvent";
+import ErrorPage from "./pages/Error";
 import EventDetailPage, {
-  action as deleteAction,
   loader as eventDetailLoader,
-} from "./components/Pages/EventDetails";
-import NewEventPage, {
-  action as newEventAction,
-} from "./components/Pages/NewEvent";
-import EditEventPage from "./components/Pages/EditEvent";
-import Layout from "./components/Pages/Root";
-import EventsRootLayout from "./components/Pages/EventsRoot";
-import ErrorPage from "./components/Pages/Error";
+  action as deleteEventAction,
+} from "./pages/EventDetail";
+import EventsPage, { loader as eventsLoader } from "./pages/Events";
+import EventsRootLayout from "./pages/EventsRoot";
+import HomePage from "./pages/Home";
+import NewEventPage from "./pages/NewEvent";
+import RootLayout from "./pages/Root";
+import { action as manipulateEventAction } from "./components/EventForm";
+import NewsletterPage, { action as newsletterAction } from "./pages/Newsletter";
+import AuthenticationPage, {
+  action as authAction,
+} from "./pages/Authentication";
+import { action as logoutAction } from "./pages/Logout";
+import { checkAuthLoader, tokenLoader } from "./util/auth";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <RootLayout />,
     errorElement: <ErrorPage />,
+    id: "root",
+    loader: tokenLoader,
     children: [
       { index: true, element: <HomePage /> },
       {
@@ -27,7 +35,7 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <EventsPage />,
-            loader: eventLoader,
+            loader: eventsLoader,
           },
           {
             path: ":eventId",
@@ -37,13 +45,37 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <EventDetailPage />,
-                action: deleteAction,
+                action: deleteEventAction,
               },
-              { path: "edit", element: <EditEventPage /> },
+              {
+                path: "edit",
+                element: <EditEventPage />,
+                action: manipulateEventAction,
+                loader: checkAuthLoader,
+              },
             ],
           },
-          { path: "new", element: <NewEventPage />, action: newEventAction },
+          {
+            path: "new",
+            element: <NewEventPage />,
+            action: manipulateEventAction,
+            loader: checkAuthLoader,
+          },
         ],
+      },
+      {
+        path: "auth",
+        element: <AuthenticationPage />,
+        action: authAction,
+      },
+      {
+        path: "newsletter",
+        element: <NewsletterPage />,
+        action: newsletterAction,
+      },
+      {
+        path: "logout",
+        action: logoutAction,
       },
     ],
   },
