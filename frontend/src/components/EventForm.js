@@ -84,7 +84,7 @@ function EventForm({ method, event }) {
 
 export default EventForm;
 
-export async function action({ request, params }) {
+export async function action({ params, request }) {
   const method = request.method;
   const data = await request.formData();
 
@@ -107,7 +107,7 @@ export async function action({ request, params }) {
     method: method,
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
+      "Authorization": "Bearer " + token,
     },
     body: JSON.stringify(eventData),
   });
